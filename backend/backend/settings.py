@@ -24,24 +24,32 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
+
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-6=h1j*f4g_mpn%&ba=a=$&qz_po$do_)t(6l%zsc%y!r-o1*ek"
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-default-key-change-me')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    "unfold",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # Third-party apps
+    "rest_framework",
+    'corsheaders',
+    # Local apps
+    "tracking"
+    
 ]
 
 MIDDLEWARE = [
