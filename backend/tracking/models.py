@@ -1,16 +1,24 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
 
 class EbayAccount(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     account_name = models.CharField(max_length=100)
     auth_token = models.TextField()
+    refresh_token = models.TextField(null=True, blank=True)
+    token_expiry = models.DateTimeField(null=True, blank=True)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.account_name}"
+
+    @property
+    def is_token_valid(self):
+        from django.utils import timezone
+        return self.token_expiry and self.token_expiry > timezone.now()
 
 class TrackingConversion(models.Model):
     STATUS_CHOICES = [
@@ -25,6 +33,7 @@ class TrackingConversion(models.Model):
         ('usps', 'USPS'),
         ('ups', 'UPS'),
         ('fedex', 'FedEx'),
+        ('aquiline', 'Aquiline'),
         ('other', 'Other'),
     ]
 
@@ -41,6 +50,17 @@ class TrackingConversion(models.Model):
 
     def __str__(self):
         return f"{self.ebay_order_id} - {self.amazon_tracking_number}"
+
+    def convert_to_aquiline(self):
+        if self.original_carrier == 'amzl':
+            # Add your Aquiline conversion logic here
+            # This is a placeholder - you'll need to implement the actual conversion
+            self.converted_carrier = 'aquiline'
+            self.converted_tracking_number = f"AQ-{self.amazon_tracking_number}"
+            self.status = 'completed'
+            self.save()
+            return True
+        return False
 
 class BulkUpload(models.Model):
     STATUS_CHOICES = [

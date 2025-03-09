@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "../src/app/globals.css";
+import "./globals.css";
 import Navigation from "./components/Navigation";
+import { AuthProvider } from "./contexts/AuthContext";
+import SubscriptionBanner from "./components/SubscriptionBanner";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,12 +21,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <div className="min-h-screen bg-gray-100">
-          <Navigation />
-          <main className="py-10">
-            <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">{children}</div>
-          </main>
-        </div>
+        <AuthProvider>
+          <div className="min-h-screen bg-gray-100">
+            <Navigation />
+            <SubscriptionBanner />
+            <main className="py-10">
+              <div className="mx-auto max-w-7xl sm:px-6 lg:px-8">{children}</div>
+            </main>
+          </div>
+        </AuthProvider>
       </body>
     </html>
   );
